@@ -1,17 +1,16 @@
 import matplotlib.pyplot as plt
 
-#f = open('line.txt')
-#for line in f.readline():
-#    print line
-#f.close()
 with open('line.txt') as f:
    array = map(int, f)
 
-#print array
-#plt.plot([64,65,63,64])
+# develop basic plot
 plt.plot(array)
-#plt.plot(1, 2, 3, 4], [64,65,63,64], 'b-')
-plt.axis([0, 8, 0, 255])
 
+# adjust axis, first two vals are x, second two are y.
+plt.axis([0, len(array)-1, 0, 255])
+
+# sample legend
 plt.ylabel('Luma Values')
+
+# display
 plt.show()
