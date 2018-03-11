@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
+import sys
 
-with open('line.txt') as f:
+file = sys.argv[1]
+
+with open(file) as f:
    array = map(int, f)
 
 # develop basic plot
