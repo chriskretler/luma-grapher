@@ -5,70 +5,84 @@ core = vs.get_core()
 scriptPath = '/usr/share/vsscripts'
 sys.path.append(os.path.abspath(scriptPath))
 import havsfunc as hf
-from ctypes import *
+#from ctypes import *
 
 def chromaAdjust(clp, pxlright, pxlup):
 	clpChroma = core.std.CropRel(clp, left=0, right=pxlright, top=pxlup, bottom=0)
 	clpChroma = core.std.AddBorders(clpChroma, left=pxlright, right=0, top=0, bottom=pxlup)
 	return core.std.Merge(clipa=clp, clipb=clpChroma, weight=[0, 1])
-
-def parse_clip(n, f):
+	
+def parseClip(n, f):
 
    fout = f.copy()
-   parse_frame(f, fout)
+   fnew = parseFrame(f, fout)
+   #fnew = fout
 
-   return fout
-   
+   return fnew
 
-def parse_frame(in_frame, out_frame):
+def parseFrame(inFrame, outFrame):
 
-#   import time
-#   filename = 'frames-' + '-' + time.strftime("%Y%m%d-%H%M%S")
-#   file = open(filename, 'w')
-#   file.write(str(plane_width))
-#   for x in range(plane_width):
-#   file.write("howdy")
-#   file.write(str(frame.readonly))
-#   file.write(str(out_frame.readonly))
-#   file.close   
-   
    # 0 is for y, 1 for u, 2 for v.
-   in_plane = in_frame.get_read_array(0)
-   #out_plane = out_frame.get_write_array(0)
+   inPlane = inFrame.get_read_array(0)
+   outPlane = outFrame.get_write_array(0)
 
-   height = len(in_plane)
-   row_size = len(in_plane[0])
+   height = len(inPlane)
+   width = len(inPlane[0])
    
-   stride = in_frame.get_stride(0)
-   #dst_stride = out_frame.get_stride(0)
+   invalidVal = 35
+   recoveryVal = 80
+   window = 20
+   nextValue = 0
+   startRange = 0 
+   endLocation = 0
+   endRange = 0
    
-   srcp = in_frame.get_read_ptr(0)
-   dstp = out_frame.get_write_ptr(0)
-   
-   vs_bitblt(dstp, stride, srcp, stride, row_size, height)
    #print(out_frame.props)
-   #for x in range(plane_width):
-      #out_plane[line_num, x] = in_plane[line_num, x] + 10
+   for h in range(height):
+      for w in range(width):
+      
+         # start of section that handles undershoot
+         if inPlane[h, w] <= invalidVal:
+            startRange = w
 
-   return clp
+            if w + window >= width:
+               endRange = width
+            else:
+               endRange = w + window
+            
+            # over the given range, look for a value above a threshold.
+            # if you find it, assign it to a variable and tell us at what location
+            # you found it, because we're going to use that location later.
+            for tempW in range(startRange, endRange):
+               if inPlane[h, tempW] >= recoveryVal:
+                  nextValue = inPlane[h, tempW]
+                  endLocation = tempW
+                  break
+            
+            # if nextValue is still 0, then we haven't found a value
+            # greater than the invalid value in our new range, so set
+            # some default values.
+            if nextValue == 0:
+               nextValue = invalidVal
+               endLocation = endRange
+            
+            # Now that we've determined the start and end places, and 
+            # the value of the replacement value, write the replacement
+            # value for all spots of our temporary array.
+            for writeW in range(startRange, endLocation):
+               outPlane[h, writeW] = nextValue
+               #invalidVal + int((invalidVal - inPlane[h, w]) / 2)
+            w = endLocation
+
+   return outFrame
    
-def vs_bitblt(dstp, dst_stride, srcp, src_stride, row_size, height):
-    if height > 0:
-        if src_stride == dst_stride and src_stride == row_size:
-            #ctypes.memmove(to_address, from_address, typesize*(size-i-1))
-            memmove(dstp, srcp, row_size * height)
-        else:
-            for i in range(height):
-                memmove(dstp, srcp, row_size)
-                srcp += src_stride
-                dstp += dst_stride
 
 clp = core.d2v.Source(input='./video/game1-disc1.d2v')
 clp = core.std.Trim(clp, 14250, 28690)
 clp = chromaAdjust(clp, 8, 4)
 clp = hf.QTGMC(clp, TFF=True, Preset='Placebo')
 
-clpNew = core.std.ModifyFrame(clip=clp, clips=clp, selector=parse_clip)
+clpNew = core.std.ModifyFrame(clip=clp, clips=clp, selector=parseClip)
 clp = core.std.Interleave(clips=[clp, clpNew])
 
 clp.set_output()
