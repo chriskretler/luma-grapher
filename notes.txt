@@ -1,14 +1,1 @@
-from vapoursynth c++ avisynth compatibility function:
-
-        {
-            uint16_t *y = (uint16_t *)vsapi->getWritePtr(dst, 0);
-            uint16_t *u = (uint16_t *)vsapi->getWritePtr(dst, 1);
-            uint16_t *v = (uint16_t *)vsapi->getWritePtr(dst, 2);
-
-            const uint16_t *srcp16 = (const uint16_t *)srcp;
-            for (int h = 0; h < vi->height; h++) {
-                for (int x = 0; x < vi->width; x++)
-                    y[x] = srcp16[x]>>6;
-                y += vsapi->getStride(dst, 0)/2;
-                srcp16 += vi->width;
-		}
+Contrary to vsynth doc, you don't need to use the get_write_ptr to write to the output frame.  You can copy the input frame and use get_write_array to get an editable array.

@@ -29,9 +29,9 @@ def parseFrame(inFrame, outFrame):
    height = len(inPlane)
    width = len(inPlane[0])
    
-   invalidVal = 35
-   recoveryVal = 80
-   window = 20
+   invalidVal = 30
+   recoveryVal = 35
+   window = 6
    nextValue = 0
    startRange = 0 
    endLocation = 0
@@ -70,9 +70,17 @@ def parseFrame(inFrame, outFrame):
             # the value of the replacement value, write the replacement
             # value for all spots of our temporary array.
             for writeW in range(startRange, endLocation):
-               outPlane[h, writeW] = nextValue
+            # without this check, it is writing even when it shouldn't.
+            # why is that?
+               if inPlane[h, writeW] <= invalidVal:
+                  outPlane[h, writeW] = nextValue
                #invalidVal + int((invalidVal - inPlane[h, w]) / 2)
             w = endLocation
+            
+            # set this back to 0, so we can use it's value to detect if
+            # it has been set by finding a recovery value.
+         nextValue = 0
+         endLocation = 0
 
    return outFrame
    
@@ -85,4 +93,4 @@ clp = hf.QTGMC(clp, TFF=True, Preset='Placebo')
 clpNew = core.std.ModifyFrame(clip=clp, clips=clp, selector=parseClip)
 clp = core.std.Interleave(clips=[clp, clpNew])
 
-clp.set_output()
+clpNew.set_output()
