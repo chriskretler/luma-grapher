@@ -5,7 +5,6 @@ core = vs.get_core()
 scriptPath = '/usr/share/vsscripts'
 sys.path.append(os.path.abspath(scriptPath))
 import havsfunc as hf
-#from ctypes import *
 
 def chromaAdjust(clp, pxlright, pxlup):
 	clpChroma = core.std.CropRel(clp, left=0, right=pxlright, top=pxlup, bottom=0)
@@ -28,6 +27,7 @@ def parseFrame(inFrame, outFrame):
 
    height = len(inPlane)
    width = len(inPlane[0])
+   w = 0
    
    invalidVal = 30
    recoveryVal = 35
@@ -39,7 +39,9 @@ def parseFrame(inFrame, outFrame):
    
    #print(out_frame.props)
    for h in range(height):
-      for w in range(width):
+      # use while loop rather than range as we need to jump
+      # to particular spots after processing a sub-range.
+      while w < width:
       
          # start of section that handles undershoot
          if inPlane[h, w] <= invalidVal:
@@ -70,17 +72,17 @@ def parseFrame(inFrame, outFrame):
             # the value of the replacement value, write the replacement
             # value for all spots of our temporary array.
             for writeW in range(startRange, endLocation):
-            # without this check, it is writing even when it shouldn't.
-            # why is that?
-               if inPlane[h, writeW] <= invalidVal:
-                  outPlane[h, writeW] = nextValue
-               #invalidVal + int((invalidVal - inPlane[h, w]) / 2)
-            w = endLocation
+               outPlane[h, writeW] = nextValue
+
+            # set the counter to the end of the write range, subtracting 1 to 
+            # account for the increment that occurs at the end of this function.
+            w = endLocation - 1
             
-            # set this back to 0, so we can use it's value to detect if
-            # it has been set by finding a recovery value.
+         # set this back to 0, so we can use it's value to detect if
+         # it has been set by finding a recovery value.
          nextValue = 0
          endLocation = 0
+         w += 1
 
    return outFrame
    
