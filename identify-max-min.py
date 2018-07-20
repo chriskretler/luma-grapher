@@ -1,10 +1,13 @@
 import numpy as np
 from datetime import datetime
 import operator
+import sys
 
 time1 = datetime.now()
 
-with open('Sather-line-352-original.txt') as f:
+file = sys.argv[1]
+
+with open(file) as f:
    array = np.array(map(int, f))
 
 # returns x position where average diff across spacing > limit.
@@ -43,10 +46,6 @@ def ret_max_min_values(array, grad_array, limit):
          x_pos_array_row.append(max_value)
          x_pos_array.append(x_pos_array_row)
    return x_pos_array
-
-def ret_idx(array):
-   min_idxs = [(idx, val) for idx, val in enumerate(np.gradient(array, 1)) if abs(val) > 12]
-   return min_idxs
 
 overshoot_points = find_diff(array, spacing=1, limit=15)
 #overshoot_points = find_gradient(array, 5, 2.5)

@@ -1,9 +1,12 @@
 import numpy as np
 from datetime import datetime
+import sys
 
 time1 = datetime.now()
 
-with open('Sather-line-352-original.txt') as f:
+file = sys.argv[1]
+
+with open(file) as f:
    array = np.array(map(int, f))
 
 def find_diff(array, spacing, limit):
@@ -23,8 +26,15 @@ def ret_high_values(array, grad_array, limit):
          x_pos_array_row.append(array[it])
          x_pos_array.append(x_pos_array_row)
    return x_pos_array
+   
+def ret_diff(array, spacing, limit):
+   return [(idx, array[idx]) 
+   for idx, val 
+   in enumerate(np.diff(array, spacing)) 
+   if abs(val) > limit]
 
-overshoot_points = find_diff(array, 1, 12)
+#overshoot_points = find_diff(array, 1, 12)
+overshoot_points = ret_diff(array, 1, 12)
 #overshoot_points = find_gradient(array, 5, 2.5)
 np.savetxt("./overshoot_points.txt", overshoot_points, fmt='%i, %i', delimiter=",", newline="\n")
 
