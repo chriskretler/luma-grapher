@@ -1,1 +1,1 @@
-Contrary to vsynth doc, you don't need to use the get_write_ptr to write to the output frame.  You can copy the input frame and use get_write_array to get an editable array.
+The ideal resolve is to clamp rather than average.
