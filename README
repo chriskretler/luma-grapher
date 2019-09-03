@@ -1,6 +1,21 @@
-Simple to the point of boring, take a luma line from vsynth and graph it. If you are not Chris, you do not care.
+The scripts directory consists of three classes of scripts:
 
-put plot.py and line.txt in the same folder
+- Identify scripts: find the points of edge over-enhancement via various means.
+- Fix scripts: fix the points previously identified via various means.
+- Plot scripts: create interactive plots of the original line, original overlay with identified points, and updated lines.
 
-Run:
-python plot.py
+Examples:
+1. Identify scripts:
+python identify-max-min.py ../samples/Sather-line-352-original.txt
+
+this analyzes the Sather original line and generates the points of over-enhancement.
+
+2. Fix scripts: 
+python fix-via-averaging.py ../samples/Sather-line-352-original.txt
+
+This script assumes 'overshoot_points.txt' is in the same directory as the script itself, and uses that as input to remove over-enhancement from the input file.
+
+3. Plot scripts:
+python plot.py output.txt 
+
+This script takes the 'overshoot_points.txt' and output file of the previous steps and plots them on a single overlay chart.
