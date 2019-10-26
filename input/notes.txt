@@ -1,1 +1,1 @@
-In the case of these lines, the number associated with the line is the vertical position from the top of the horizontal line.
+The line number in the file name is the vertical position from the top of the frame.
