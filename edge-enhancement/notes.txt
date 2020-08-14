@@ -1,1 +1,5 @@
 The ideal resolve is to clamp rather than average.
+
+One idea is that the size of the gap where the actual original luma value has been corrupted is proportional to difference between max and min luma values in a line. I.e. Big contrasts between white and dark in the original lead to wide gaps where the original values have been lost. 
+   - If this is so, then looking for differences over widths of 1 or 2 pixels will not be sufficient to find these longer lines with larger luma differences.  We'll need to look for long lines, and determine the length of the line (the luma difference between high and low) to determine how wide of a gap of corruption we'll need to restore.
+   - Numpy gradient by default computes the difference between values on either side of the index you pass to it, as opposed to diff, which looks at consecutive integers. Gradient can also be asked to look at wider ranges, so it may be the better fit for our use case.

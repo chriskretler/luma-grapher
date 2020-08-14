@@ -1,1 +1,23 @@
 Experiments of using python to interact with video via the VapourSynth API.
+=======
+The scripts directory consists of three classes of scripts:
+
+- Identify scripts: find the points of edge over-enhancement via various means.
+- Fix scripts: fix the points previously identified via various means.
+- Plot scripts: create interactive plots of the original line, original overlay with identified points, and updated lines.
+
+Examples:
+1. Identify scripts:
+python identify-max-min.py ../samples/Sather-line-352-original.txt
+
+this analyzes the Sather original line and generates the points of over-enhancement.
+
+2. Fix scripts:
+python fix-via-averaging.py ../samples/Sather-line-352-original.txt
+
+This script assumes 'overshoot_points.txt' is in the same directory as the script itself, and uses that as input to remove over-enhancement from the input file.
+
+3. Plot scripts:
+python plot.py output.txt
+
+This script takes the 'overshoot_points.txt' and output file of the previous steps and plots them on a single overlay chart.
