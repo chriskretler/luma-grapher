@@ -1,6 +1,1 @@
-Simple to the point of boring, take a luma line from vsynth and graph it. If you are not Chris, you do not care.
-
-put plot.py and line.txt in the same folder
-
-Run:
-python plot.py
+Experiments of using python to interact with video via the VapourSynth API.
